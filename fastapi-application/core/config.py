@@ -8,8 +8,14 @@ class RunConfig(BaseModel):
     port: int = 8000
 
 
+class ApiV1Prefix(BaseModel):
+    prefix: str = "/v1"
+    users: str = "/users"
+    
+
 class ApiPrefix(BaseModel):
     prefix: str = "/api"
+    v1: ApiV1Prefix = ApiV1Prefix()
 
 
 class DatabaseConfig(BaseModel):
@@ -30,7 +36,7 @@ class DatabaseConfig(BaseModel):
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=(".env.template", ".env"),
+        env_file=("fastapi-application/.env"),
         case_sensitive=False,
         env_nested_delimiter="__",
         env_prefix="APP_CONFIG__",
@@ -39,4 +45,5 @@ class Settings(BaseSettings):
     api: ApiPrefix = ApiPrefix()
     db: DatabaseConfig
     
-settings =Settings() 
+settings =Settings() # type: ignore
+
