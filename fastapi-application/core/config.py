@@ -34,9 +34,10 @@ class DatabaseConfig(BaseModel):
 }
 
 
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=("fastapi-application/.env"),
+        env_file=("/home/sergo/projects/my_fastapi_app/fastapi-application/.env"),
         case_sensitive=False,
         env_nested_delimiter="__",
         env_prefix="APP_CONFIG__",
@@ -46,5 +47,5 @@ class Settings(BaseSettings):
     db: DatabaseConfig 
     
     
-settings =Settings() # type: ignore
+settings =Settings()  # type: ignore
 
