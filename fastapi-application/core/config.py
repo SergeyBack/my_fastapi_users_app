@@ -22,8 +22,8 @@ class DatabaseConfig(BaseModel):
     url: PostgresDsn
     echo: bool = False
     echo_pool: bool = False
-    pool_size: int =50
-    max_overflow: int =10
+    pool_size: int = 50
+    max_overflow: int = 10
     
     naming_convention: dict[str,str] = {
   "ix": "ix_%(column_0_label)s",
@@ -43,7 +43,8 @@ class Settings(BaseSettings):
     )                   
     run: RunConfig = RunConfig()
     api: ApiPrefix = ApiPrefix()
-    db: DatabaseConfig
+    db: DatabaseConfig 
+    
     
 settings =Settings() # type: ignore
 
