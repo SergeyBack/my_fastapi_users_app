@@ -3,6 +3,8 @@ from contextlib import asynccontextmanager
 from core.models import db_helper
 from fastapi.responses import ORJSONResponse
 
+from api.webhooks import webhook_router
+
 from fastapi import FastAPI
 from fastapi.openapi.docs import (
     get_redoc_html,
@@ -58,6 +60,7 @@ def create_app(
         lifespan=lifespan,
         docs_url=None if create_custom_static_urls else "/docs", 
         redoc_url= None if create_custom_static_urls else "/redoc",
+        webhooks=webhook_router,
     )
     if create_custom_static_urls:
         register_static_docs_routes(app)
