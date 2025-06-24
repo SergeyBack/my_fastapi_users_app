@@ -5,6 +5,7 @@ from typing import Sequence
 from core.models import User
 from core.schemas.user import UserCreate
 
+
 async def get_all_users(
     session: AsyncSession
     )->Sequence[User]:
