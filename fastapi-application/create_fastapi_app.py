@@ -12,6 +12,9 @@ from fastapi.openapi.docs import (
     get_swagger_ui_oauth2_redirect_html,
 )
 
+from errors_handlers import register_errorsr_handlers
+from middlewares import register_middlewares
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -64,5 +67,8 @@ def create_app(
     )
     if create_custom_static_urls:
         register_static_docs_routes(app)
+        
+    register_errorsr_handlers(app)
+    register_middlewares(app)
     return app
      
