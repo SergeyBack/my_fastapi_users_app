@@ -41,7 +41,6 @@ class LoggingConfig(BaseModel):
         return logging.getLevelNamesMapping()[self.log_level.upper()]
         
 
-
 class ApiV1Prefix(BaseModel):
     prefix: str = "/v1"
     auth: str = "/auth"
@@ -58,6 +57,7 @@ class ApiPrefix(BaseModel):
         parts = (self.prefix, self.v1.prefix, self.v1.auth, "/login")
         path ="".join(parts)
         return path.removeprefix("/")
+
 
 class DatabaseConfig(BaseModel):
     url: PostgresDsn
