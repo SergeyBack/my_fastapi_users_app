@@ -13,7 +13,7 @@ from fastapi.openapi.docs import (
 )
 
 from errors_handlers import register_errorsr_handlers
-from middlewares import register_middlewares
+from middlewares.middlewares import register_middlewares
 
 
 @asynccontextmanager

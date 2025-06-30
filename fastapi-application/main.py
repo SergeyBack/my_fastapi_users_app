@@ -4,7 +4,6 @@ from api import router as api_router
 
 from create_fastapi_app import create_app
 import logging
-from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi.responses import ORJSONResponse
@@ -12,7 +11,6 @@ from fastapi.responses import ORJSONResponse
 from core.utils.templates import templates
 from views import router as views_router
 from api import router as api_router
-from core.models import db_helper
 
 logging.basicConfig(
         level = settings.logging.log_level_value,
