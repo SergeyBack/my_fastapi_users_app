@@ -12,22 +12,29 @@ services:
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
 
-  pg:
-    image: postgres
+
+  app:
+    build:
+      dockerfile: ./Dockerfile
+      context: ./
     environment:
-      POSTGRES_DB: shop
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      PGDATA: /var/lib/postgresql/data
+      APP_CONFIG__DB__URL: postgresql+asyncpg://postgres:password@pg:5432/shop
+      APP_CONFIG__DB__ECHO: 0
+      APP_CONFIG__GUNICORN_WORKERS: 4
+      APP_CONFIG__ACCESS_TOKEN__RESET_PASSWORD_TOKEN_SECRET: ee3191d2dcee76f437b354863bc838f6a54896d4232d6496edb322c1a9db272c
+      APP_CONFIG__ACCESS_TOKEN__VERIFICATION_TOKEN_SECRET: e93b4be4d86311556620ff846003ed3d842c0f939434a4e21b12b1e73a79c059
     ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready" ]
-      interval: 5s
-      timeout: 3s
-      retries: 3
+      - "8000:8000"
+    depends_on:
+      pg:
+        condition: service_healthy
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./fastapi-application
+          target: /app
+        - action: rebuild
+          path: ./poetry.lock
 
   maildev:
     image: maildev/maildev
@@ -41,23 +48,27 @@ services:
     logging:
       driver: "json-file"
       options:
-        max-size: "1m"
+        max-size: "1m"  
 
-  adminer:
-    image: adminer
-    ports:
-      - "8080:8080"
 
-  pgadmin:
-    image: dpage/pgadmin4
+  pg:
+    image: postgres
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.org
-      PGADMIN_DEFAULT_PASSWORD: admin
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
-    ports:
-      - "5050:80"
-
-
+      POSTGRES_DB: shop
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      PGDATA: /var/lib/postgresql/data
+    # ports:
+    #   - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+  
 volumes:
-  pgdata:
-  rabbitmq-data:
+  pgdata: 
+
+    
