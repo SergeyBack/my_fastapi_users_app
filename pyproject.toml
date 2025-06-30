@@ -16,6 +16,8 @@ orjson = "^3.10.18"
 gunicorn = "^23.0.0"
 aiohttp = "^3.12.13"
 jinja2 = "^3.1.6"
+aiosmtplib = "^4.0.1"
+taskiq = "^0.11.17"
 
 [tool.poetry.group.dev.dependencies]
 black = "^25.1.0"
