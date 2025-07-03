@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 
+from core import broker
 from core.models import db_helper
 from fastapi.responses import ORJSONResponse
 
@@ -19,9 +20,11 @@ from middlewares.middlewares import register_middlewares
 @asynccontextmanager
 async def lifespan(app: FastAPI):
         #startp
+        await broker.startup()
         yield
         #shutdwn
         await db_helper.dispose()
+        await broker.shutdown()
 
 
 def register_static_docs_routes(app: FastAPI):
