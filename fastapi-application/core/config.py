@@ -1,4 +1,5 @@
 from pydantic import PostgresDsn
+from pydantic import AmqpDsn
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Literal
@@ -35,6 +36,7 @@ class LoggingConfig(BaseModel):
         'crittical',
     ] = 'info'
     log_format: str = LOG_DEFAULT_FORMAT
+    log_date_format: str = "%Y-%m-%d %H:%M:%S"
     
     @property
     def log_level_value(self) -> int:
@@ -58,6 +60,11 @@ class ApiPrefix(BaseModel):
         parts = (self.prefix, self.v1.prefix, self.v1.auth, "/login")
         path ="".join(parts)
         return path.removeprefix("/")
+
+
+class TaskiqConfig(BaseModel):
+    url: str ="amqp://guest:guest@rabbitmq:5672//" 
+    log_format: str = WORKER_LOG_DEFAULT_FORMAT
 
 
 class DatabaseConfig(BaseModel):
@@ -93,6 +100,7 @@ class Settings(BaseSettings):
     gunicorn: GunicornConfig = GunicornConfig()
     logging: LoggingConfig = LoggingConfig()
     api: ApiPrefix = ApiPrefix()
+    taskiq: TaskiqConfig = TaskiqConfig()
     db: DatabaseConfig 
     access_token: AccessToken
     
