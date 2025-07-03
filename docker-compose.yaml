@@ -11,6 +11,11 @@ services:
       RABBITMQ_DEFAULT_PASS: "guest"
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD-SHELL", "echo 'import socket; socket.create_connection((\"localhost\", 5672))' | python3"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
 
   app:
@@ -23,10 +28,13 @@ services:
       APP_CONFIG__GUNICORN_WORKERS: 4
       APP_CONFIG__ACCESS_TOKEN__RESET_PASSWORD_TOKEN_SECRET: ee3191d2dcee76f437b354863bc838f6a54896d4232d6496edb322c1a9db272c
       APP_CONFIG__ACCESS_TOKEN__VERIFICATION_TOKEN_SECRET: e93b4be4d86311556620ff846003ed3d842c0f939434a4e21b12b1e73a79c059
+      BROKER_URL: amqp://guest:guest@rabbitmq:5672// 
     ports:
       - "8000:8000"
     depends_on:
       pg:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     develop:
       watch:
@@ -35,6 +43,24 @@ services:
           target: /app
         - action: rebuild
           path: ./poetry.lock
+
+
+  worker:
+    build:
+      dockerfile: ./Dockerfile
+      context: ./
+    command: taskiq worker core:broker --no-configure-logging --fs-discover --tasks-pattern "**/tasks"
+    environment:
+      # Добавьте те же переменные, что и для app
+      APP_CONFIG__DB__URL: postgresql+asyncpg://postgres:password@pg:5432/shop
+      APP_CONFIG__DB__ECHO: 0
+      APP_CONFIG__ACCESS_TOKEN__RESET_PASSWORD_TOKEN_SECRET: ee3191d2dcee76f437b354863bc838f6a54896d4232d6496edb322c1a9db272c
+      APP_CONFIG__ACCESS_TOKEN__VERIFICATION_TOKEN_SECRET: e93b4be4d86311556620ff846003ed3d842c0f939434a4e21b12b1e73a79c059
+      BROKER_URL: amqp://guest:guest@rabbitmq:5672//
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
 
   maildev:
     image: maildev/maildev
@@ -53,6 +79,7 @@ services:
 
   pg:
     image: postgres
+    user: postgres
     environment:
       POSTGRES_DB: shop
       POSTGRES_USER: postgres
@@ -70,5 +97,6 @@ services:
   
 volumes:
   pgdata: 
+  rabbitmq-data:
 
     
